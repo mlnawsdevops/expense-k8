@@ -5,9 +5,6 @@ metadata:
   namespace: expense
 data:
   DB_HOST: mysql
-  DB_USER: expense
-  DB_PWD: ExpenseApp@1
-  DB_DATABASE: transactions
 
 ---
 apiVersion: apps/v1
@@ -20,7 +17,7 @@ metadata:
     tier: api
     project: expense
 spec:
-  replicas: 1   # keep 1 for stability/debug
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -33,49 +30,14 @@ spec:
         tier: api
         project: expense
     spec:
-      initContainers:
-      - name: wait-for-mysql
-        image: busybox:1.28
-        command:
-          - sh
-          - -c
-          - |
-            until nc -z mysql 3306;
-            do
-              echo "Waiting for MySQL on port 3306...";
-              sleep 3;
-            done
-
       containers:
       - name: backend
         image: joindevops/backend:v1
         ports:
         - containerPort: 8080
-
         envFrom:
         - configMapRef:
             name: backend
-
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 100m
-            memory: 128Mi
-
-        readinessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 10
-
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
 
 ---
 apiVersion: v1
