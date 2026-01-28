@@ -23,7 +23,7 @@ spec:
     spec: 
       containers:
       - name: backend
-        image: joindevops/backend:v1.0
+        image: joindevops/backend:v1
         envFrom:
         - configMapRef:
             name: backend
@@ -46,6 +46,7 @@ spec:
     targetPort: 8080
 
 ---
+# passing DB_HOST to container-application
 apiVersion: v1 
 kind: ConfigMap
 metadata:
