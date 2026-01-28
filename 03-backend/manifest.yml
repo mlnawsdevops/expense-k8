@@ -1,4 +1,4 @@
-# passing DB_HOST to container-application
+# ConfigMap with correct env variable names
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,9 +10,9 @@ data:
   DB_PWD: ExpenseApp@1
   DB_DATABASE: transactions
 
-
 ---
-apiVersion: apps/v1 
+# Backend Deployment
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
@@ -33,17 +33,20 @@ spec:
       labels:
         project: expense
         app: backend
-        tier: app 
-    spec: 
+        tier: app
+    spec:
       containers:
       - name: backend
         image: mlndockerhub/backend:v1
         envFrom:
         - configMapRef:
             name: backend
+        ports:
+        - containerPort: 8080
 
 ---
-apiVersion: v1 
+# Backend Service
+apiVersion: v1
 kind: Service
 metadata:
   name: backend
@@ -51,10 +54,10 @@ metadata:
 spec:
   selector:
     project: expense
-    app: backend 
+    app: backend
     tier: app
   ports:
   - name: backend-port
-    protocol: "TCP"
+    protocol: TCP
     port: 8080
     targetPort: 8080
