@@ -1,24 +1,29 @@
-# ConfigMap with correct env variable names
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend
   namespace: expense
 data:
-  DB_HOST: mysql 
-  DB_PORT: "3306"
+  DB_HOST: mysql
+  DB_DATABASE: transactions
 
 ---
-# Backend Deployment
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: expense
+type: Opaque
+data:
+  DB_USER: ZXhwZW5zZQ==        # base64("expense")
+  DB_PWD: RXhwZW5zZUFwcEAx     # base64("ExpenseApp@1")
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
   namespace: expense
-  labels:
-    project: expense
-    app: backend
-    tier: app
 spec:
   replicas: 2
   selector:
@@ -29,9 +34,9 @@ spec:
   template:
     metadata:
       labels:
-        project: expense
         app: backend
         tier: app
+        project: expense
     spec:
       containers:
       - name: backend
@@ -39,23 +44,7 @@ spec:
         envFrom:
         - configMapRef:
             name: backend
+        - secretRef:
+            name: mysql-secret
         ports:
         - containerPort: 8080
-
----
-# Backend Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-  namespace: expense
-spec:
-  selector:
-    project: expense
-    app: backend
-    tier: app
-  ports:
-  - name: backend-port
-    protocol: TCP
-    port: 8080
-    targetPort: 8080
