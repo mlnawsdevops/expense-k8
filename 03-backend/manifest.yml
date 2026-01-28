@@ -23,7 +23,7 @@ spec:
     spec: 
       containers:
       - name: backend
-        image: joindevops/backend:3.0.0
+        image: mlndockerhub/backend:v1
         envFrom:
         - configMapRef:
             name: backend
