@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: joindevops/mysql:v1.0
+        image: mlndockerhub/mysql:v1
 
 --- 
 
