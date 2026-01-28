@@ -35,10 +35,10 @@ metadata:
 spec: 
   selector: 
     project: expense
-    module: db
-    environment: dev
+    tier: db
+    app: mysql
   ports:
   - name: mysql-port
-    protocol: "TCP"
+    protocol: TCP
     port: 3306
-    targetPort: 3306 
+    targetPort: 3306
