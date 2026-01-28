@@ -1,11 +1,12 @@
-# # ConfigMap with correct env variable names
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: backend
-#   namespace: expense
-# data:
-#   DB_HOST: mysql
+# ConfigMap with correct env variable names
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend
+  namespace: expense
+data:
+  DB_HOST: mysql 
+  DB_PORT: "3306"
 
 ---
 # Backend Deployment
