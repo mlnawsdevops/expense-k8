@@ -23,7 +23,7 @@ spec:
     spec: 
       containers:
       - name: backend
-        image: joindevops/backend:v1
+        image: joindevops/backend:v2
         envFrom:
         - configMapRef:
             name: backend
