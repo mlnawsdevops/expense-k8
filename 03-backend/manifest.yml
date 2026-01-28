@@ -9,7 +9,6 @@ data:
   DB_PWD: ExpenseApp@1
   DB_DATABASE: transactions
 
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,7 +20,7 @@ metadata:
     tier: api
     project: expense
 spec:
-  replicas: 2
+  replicas: 1   # keep 1 for stability/debug
   selector:
     matchLabels:
       app: backend
@@ -35,37 +34,52 @@ spec:
         project: expense
     spec:
       initContainers:
-      - name: mysql-check
+      - name: wait-for-mysql
         image: busybox:1.28
-        command: ['sh', '-c', "until nslookup mysql; do echo waiting for myservice; sleep 2; done"]
+        command:
+          - sh
+          - -c
+          - |
+            until nc -z mysql 3306;
+            do
+              echo "Waiting for MySQL on port 3306...";
+              sleep 3;
+            done
+
       containers:
       - name: backend
         image: joindevops/backend:v1
+        ports:
+        - containerPort: 8080
+
+        envFrom:
+        - configMapRef:
+            name: backend
+
         resources:
           requests:
             cpu: 100m
             memory: 128Mi
-          # limits is greater than or equal to requests
           limits:
             cpu: 100m
             memory: 128Mi
-        envFrom:
-        - configMapRef:
-            name: backend
+
         readinessProbe:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 15
           periodSeconds: 10
+
         livenessProbe:
           httpGet:
             path: /health
             port: 8080
-          initialDelaySeconds: 3
-          periodSeconds: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: backend
   namespace: expense
@@ -77,20 +91,5 @@ spec:
   ports:
   - name: backend-port
     protocol: TCP
-    port: 8080 # service port
-    targetPort: 8080 # container port
-
-# ---
-# apiVersion: autoscaling/v1
-# kind: HorizontalPodAutoscaler
-# metadata:
-#  name: backend
-#  namespace: expense
-# spec:
-#  scaleTargetRef:
-#    apiVersion: apps/v1
-#    kind: Deployment
-#    name: backend
-#  minReplicas: 1
-#  maxReplicas: 10
-#  targetCPUUtilizationPercentage: 15 # usually 75 in real environment
+    port: 8080
+    targetPort: 8080
