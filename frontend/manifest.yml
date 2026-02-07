@@ -44,6 +44,24 @@ spec:
     targetPort: 80
 
 ---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: frontend-mln
+  namespace: expense
+spec:
+  type: NodePort 
+  selector: 
+    project: expense
+    tier: web
+    app: frontend
+  ports:
+  - name: frontend-svc-port
+    protocol: "TCP"
+    port: 80
+    targetPort: 80
+
+---
 # frontend service attaching to alb target group. not using frontend loadbalancer service
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
