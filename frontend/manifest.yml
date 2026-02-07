@@ -32,7 +32,7 @@ metadata:
   name: frontend
   namespace: expense
 spec:
-  type: LoadBalancer
+  # type: LoadBalancer # instead of using ingress resource & ingress controller and Targrt group binding
   selector: 
     project: expense
     tier: web
@@ -43,3 +43,15 @@ spec:
     port: 80
     targetPort: 80
 
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: frontend
+  namespace: expense
+spec:
+  serviceRef:
+    name: frontend # route traffic to the awesome-service
+    port: 80
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
+  targetType: ip
