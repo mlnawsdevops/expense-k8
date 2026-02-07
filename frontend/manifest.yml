@@ -107,5 +107,5 @@ spec:
     name: frontend # route traffic to the awesome-service
     port: 80
   # alb IP target group
-  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb-cat/14d807433e14d73e
   targetType: ip
