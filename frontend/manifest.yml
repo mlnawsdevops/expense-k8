@@ -44,7 +44,7 @@ spec:
     targetPort: 80
 
 ---
-# frontend service attaching to alb target group. no frontend loadbalancer service
+# frontend service attaching to alb target group. not using frontend loadbalancer service
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
@@ -57,3 +57,18 @@ spec:
   # alb target group
   targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
   targetType: ip
+
+# targetgroupbinding for expense-mln
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: frontend-mln
+  namespace: expense
+spec:
+  serviceRef:
+    name: frontend # route traffic to the awesome-service
+    port: 80
+  # alb target group
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
+  targetType: instance
