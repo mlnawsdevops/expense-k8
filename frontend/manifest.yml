@@ -1,3 +1,4 @@
+# frontend deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +27,7 @@ spec:
         image: mlndockerhub/frontend:v1
 
 ---
+# IP MODE == CLUSTER IP
 apiVersion: v1 
 kind: Service
 metadata:
@@ -44,6 +46,7 @@ spec:
     targetPort: 80
 
 ---
+# INSTANCE MODE = only NODEPORT
 apiVersion: v1 
 kind: Service
 metadata:
@@ -63,6 +66,7 @@ spec:
 
 ---
 # frontend service attaching to alb target group. not using frontend loadbalancer service
+# IP MODE
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
@@ -72,11 +76,12 @@ spec:
   serviceRef:
     name: frontend # route traffic to the awesome-service
     port: 80
-  # alb target group
+  # alb IP target group
   targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
   targetType: ip
 
-# targetgroupbinding for expense-mln
+
+# targetgroupbinding for expense-mln --> INSTANCE MODE
 ---
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
@@ -87,6 +92,20 @@ spec:
   serviceRef:
     name: frontend-mln # route traffic to the awesome-service
     port: 80
-  # alb target group
+  # alb instance target group
   targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb-mln/22341cc9a7566e7a
   targetType: instance
+
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: frontend-catalogue
+  namespace: expense
+spec:
+  serviceRef:
+    name: frontend # route traffic to the awesome-service
+    port: 80
+  # alb IP target group
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:529088275803:targetgroup/expense-dev-ingress-alb/60d1d4dd9e7b53bb
+  targetType: ip
